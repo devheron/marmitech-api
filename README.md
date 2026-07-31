@@ -22,13 +22,6 @@ O pacote está organizado em camadas: `Controller`, `Services`, `Repository`, `E
 ## Rodando local
 
 Precisa de Java 17 e um MySQL rodando na 3306 com um banco chamado `marmitech`.
-
-```bash
-git clone https://github.com/<org>/marmitech-api.git
-cd marmitech-api
-./mvnw spring-boot:run
-```
-
 A aplicação sobe em `http://localhost:8080`. O Hibernate cria as tabelas sozinho no primeiro start.
 
 Se seu MySQL local usa outra senha, exporte as variáveis antes de rodar:
@@ -43,15 +36,16 @@ export DB_PASS=suasenha
 
 Nenhuma credencial fica no código. O `application.properties` só tem valores padrão que servem para desenvolvimento local.
 
-| Variável | Padrão | Para que serve |
-|---|---|---|
-| `DB_URL` | `jdbc:mysql://localhost:3306/marmitech` | String JDBC do banco |
-| `DB_USER` | `root` | Usuário do banco |
-| `DB_PASS` | `root` | Senha do banco |
-| `PORT` | `8080` | Porta HTTP. Em produção quem define é o Cloud Run |
-| `CORS_ORIGINS` | `http://localhost:4200` | Origens liberadas, separadas por vírgula |
+| Variável       | Padrão                                  | Para que serve                                    |
+| -------------- | --------------------------------------- | ------------------------------------------------- |
+| `DB_URL`       | `jdbc:mysql://localhost:3306/marmitech` | String JDBC do banco                              |
+| `DB_USER`      | `root`                                  | Usuário do banco                                  |
+| `DB_PASS`      | `root`                                  | Senha do banco                                    |
+| `PORT`         | `8080`                                  | Porta HTTP. Em produção quem define é o Cloud Run |
+| `CORS_ORIGINS` | `http://localhost:4200`                 | Origens liberadas, separadas por vírgula          |
 
-Tem um `.env.example` na raiz com esses nomes. Copie para `.env` se quiser, mas o `.env` está no `.gitignore` e não sobe.
+Criar `.env` na raiz com esse nome.
+`.env` está no `.gitignore`.
 
 ## Docker
 
@@ -95,10 +89,10 @@ Commits seguem Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refact
 
 ## Equipe
 
-| Nome | Papel |
-|---|---|
-| Heron | Scrum Master |
-| Jihad Ghozayel | Product Owner |
-| Marina | Developer |
-| Fabricio Quintana | Developer |
-| João Rodrigues | Developer |
+| Nome              | Papel         |
+| ----------------- | ------------- |
+| Heron             | Scrum Master  |
+| Jihad Ghozayel    | Product Owner |
+| Marina            | Developer     |
+| Fabricio Quintana | Developer     |
+| João Rodrigues    | Developer     |
