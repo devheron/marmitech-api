@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.verify;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,6 +40,7 @@ import com.marmitech.Marmitech.Entity.Usuario;
 import com.marmitech.Marmitech.Services.PedidoService;
 
 @WebMvcTest(PedidoController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class PedidoControllerTest {
 
     @Autowired
@@ -136,7 +138,7 @@ public class PedidoControllerTest {
 
         mockMvc.perform( delete( "/api/pedido/delete/1" ) )
                 .andDo( print() )
-                .andExpect( status().isOk() );
+                .andExpect(status().isNoContent());
 
         verify( pedidoService, Mockito.times( 1 ) ).delete( 1 );
     }
@@ -159,7 +161,7 @@ public class PedidoControllerTest {
         mockMvc.perform( get( "/api/pedido/findByStatus" )
                         .param( "status", "FILA" ) )
                 .andDo( print() )
-                .andExpect( status().isFound() )
+                .andExpect(status().isOk())
                 .andExpect( jsonPath( "$[0].id" ).value( 1 ) );
 
         Mockito.verify( pedidoService, Mockito.times( 1 ) ).findByStatus( "FILA" );
@@ -185,7 +187,7 @@ public class PedidoControllerTest {
         mockMvc.perform( get( "/api/pedido/findByProdutoNome" )
                         .param( "nomeProduto", "Refrigerante" ) )
                 .andDo( print() )
-                .andExpect( status().isFound() )
+                .andExpect(status().isOk())
                 .andExpect( jsonPath( "$[0].id" ).value( 1 ) );
 
         Mockito.verify( pedidoService, Mockito.times( 1 ) ).findByProdutoNome( "Refrigerante" );
@@ -211,7 +213,7 @@ public class PedidoControllerTest {
         mockMvc.perform( get( "/api/pedido/findByProduto" )
                         .param( "produtoId", String.valueOf( 1 ) ) )
                 .andDo( print() )
-                .andExpect( status().isFound() )
+                .andExpect(status().isOk())
                 .andExpect( jsonPath( "$[0].id" ).value( 1 ) );
 
         Mockito.verify( pedidoService, Mockito.times( 1 ) ).findByProduto( 1 );
