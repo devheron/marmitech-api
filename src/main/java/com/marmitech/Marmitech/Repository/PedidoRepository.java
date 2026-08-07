@@ -11,10 +11,12 @@ import com.marmitech.Marmitech.Entity.Produto;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
-    public List<Pedido> findByPedidoItemsProduto(Produto produto);     
+    public List<Pedido> findByPedidoItemsProduto(Produto produto);
 
-    public List<Pedido> findByPedidoItemsProdutoNome(String nome); 
+    public List<Pedido> findByPedidoItemsProdutoNome(String nome);
 
     public List<Pedido> findByStatus(String status);
+
+    List<Pedido> findByClienteEmail(String email);
 
 }

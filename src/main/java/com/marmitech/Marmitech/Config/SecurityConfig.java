@@ -54,8 +54,25 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/usuario/login").permitAll()
-                        .anyRequest().authenticated()
-                );
+
+                        // area do cliente
+                        .requestMatchers("/api/pedido/meus/**").hasAnyRole("CLIENTE", "ADMIN")
+
+                        // usuarios: exclusivo do admin
+                        .requestMatchers("/api/usuario/**").hasRole("ADMIN")
+
+                        // escrita: admin apenas
+                        .requestMatchers(HttpMethod.POST,   "/api/produto/**", "/api/categoria/**", "/api/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,    "/api/produto/**", "/api/categoria/**", "/api/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
+
+                        // status do pedido: funcionario pode
+                        .requestMatchers(HttpMethod.PUT, "/api/pedido/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+
+                        // leitura: admin e funcionario
+                        .requestMatchers(HttpMethod.GET, "/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+
+                        .anyRequest().authenticated());
 
         http.addFilterBefore(new JwtAuthFilter(jwUtil), UsernamePasswordAuthenticationFilter.class);
         return http.build();
