@@ -14,6 +14,9 @@ import com.marmitech.Marmitech.Entity.Pedido;
 import com.marmitech.Marmitech.Mapper.ResponseMapper.PedidoResponseMapper;
 import com.marmitech.Marmitech.Services.PedidoService;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 @RestController
 @RequestMapping("/api/pedido")
 public class PedidoController {
@@ -25,7 +28,6 @@ public class PedidoController {
     public ResponseEntity<PedidoResponseDTO> save(@RequestBody PedidoRequestDTO dto) {
         return new ResponseEntity<>(pedidoService.save(dto), HttpStatus.CREATED);
     }
-
 
     @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping
@@ -71,10 +73,21 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 
+    @GetMapping("/meus")
+    public ResponseEntity<List<PedidoResponseDTO>> meusPedidos() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<PedidoResponseDTO> pedidos = pedidoService.findByClienteEmail( email )
+                .stream()
+                .map( PedidoResponseMapper::toDto )
+                .toList();
+        return new ResponseEntity<>( pedidos, HttpStatus.OK );
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         pedidoService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 }
