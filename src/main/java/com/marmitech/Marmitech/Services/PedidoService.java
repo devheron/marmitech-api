@@ -97,7 +97,12 @@ public class PedidoService {
         pedidoUpdate.setEnderecoEntrega( pedido.getEnderecoEntrega() );
         pedidoUpdate.setUsuario( pedido.getUsuario() );
         pedidoUpdate.setCliente( pedido.getCliente() );
-        pedidoUpdate.setPedidoItems( pedido.getPedidoItems() );
+
+        if (pedido.getPedidoItems() != null && !pedido.getPedidoItems().isEmpty()) {
+            pedidoUpdate.getPedidoItems().clear();
+            pedido.getPedidoItems().forEach( pedidoUpdate::addItem );
+        }
+
         return pedidoRepository.save( pedidoUpdate );
     }
 
