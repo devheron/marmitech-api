@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,7 +30,6 @@ import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.mockito.ArgumentMatchers.eq;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -66,11 +66,11 @@ class CategoriaControllerTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$[0].nome", is("Marmitex")))
                                 .andExpect(jsonPath("$[1].nome", is("Porcao torresmo")));
-
         }
 
         @Test
         @DisplayName("deve salvar uma categoria")
+        @WithMockUser(roles = "ADMIN")
         void salvarcategoria() throws Exception {
                 CategoriaResponseDTO categoriaSalva = new CategoriaResponseDTO(1, "Marmitas", "Marmitas variadas");
 
@@ -83,11 +83,11 @@ class CategoriaControllerTest {
                                 .content(jsonEnviado)).andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.id", is(1))).andExpect(jsonPath("$.nome", is("Marmitas")))
                                 .andExpect(jsonPath("$.descricao", is("Marmitas variadas")));
-
         }
 
         @Test
         @DisplayName("Deve deletar uma categoria com sucesso")
+        @WithMockUser(roles = "ADMIN")
         void DeletarCategoriaComSucesso() throws Exception {
 
                 Integer idParaDeletar = Math.toIntExact(1);
@@ -95,7 +95,6 @@ class CategoriaControllerTest {
                 doNothing().when(categoriaService).delete(idParaDeletar);
 
                 mockMvc.perform(delete("/api/categoria/delete/{id}", idParaDeletar))
-
                                 .andExpect(status().isNoContent());
 
                 verify(categoriaService, times(1)).delete(idParaDeletar);
@@ -103,6 +102,7 @@ class CategoriaControllerTest {
 
         @Test
         @DisplayName("Deve atualizar uma categoria com sucesso")
+        @WithMockUser(roles = "ADMIN")
         void deveAtualizarCategoriaComSucesso() throws Exception {
 
                 Integer idParaAtualizar = 1;
@@ -119,9 +119,7 @@ class CategoriaControllerTest {
                 mockMvc.perform(put("/api/categoria/update/{id}", idParaAtualizar)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonParaEnviar))
-
                                 .andExpect(status().isOk())
-
                                 .andExpect(jsonPath("$.id", is(idParaAtualizar.intValue())))
                                 .andExpect(jsonPath("$.nome", is("Marmitex Atualizada")))
                                 .andExpect(jsonPath("$.descricao", is("Descricao Atualizada")));

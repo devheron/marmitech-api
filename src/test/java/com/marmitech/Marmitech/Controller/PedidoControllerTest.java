@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -39,7 +40,6 @@ import com.marmitech.Marmitech.Entity.Produto;
 import com.marmitech.Marmitech.Entity.Usuario;
 import com.marmitech.Marmitech.Services.PedidoService;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -99,6 +99,7 @@ public class PedidoControllerTest {
 
     @Test
     @DisplayName("save - Deve criar um novo pedido com status CREATED")
+    @WithMockUser(roles = "ADMIN")
     void cenario01() throws Exception {
         Mockito.when(pedidoService.save(any(PedidoRequestDTO.class))).thenReturn(pedidoResponseDTO);
 
@@ -143,6 +144,7 @@ public class PedidoControllerTest {
 
     @Test
     @DisplayName("delete/{id} - Deve deletar um pedido com status OK")
+    @WithMockUser(roles = "ADMIN")
     void cenario04() throws Exception {
         Mockito.doNothing().when(pedidoService).delete(1);
 
@@ -245,6 +247,7 @@ public class PedidoControllerTest {
 
     @Test
     @DisplayName("update/{id} - Deve atualizar o Pedido com status OK")
+    @WithMockUser(roles = "ADMIN")
     void cenario12() throws Exception {
         Pedido pedidoAtualizado = pedido;
         pedidoAtualizado.setStatus("ENVIADO");
@@ -268,6 +271,7 @@ public class PedidoControllerTest {
 
     @Test
     @DisplayName("update/{id} - Deve retornar BAD_REQUEST se o Pedido não for encontrado")
+    @WithMockUser(roles = "ADMIN")
     void cenario13() throws Exception {
         Mockito.when(pedidoService.update(eq(99), any(Pedido.class)))
                 .thenThrow(new RuntimeException("Pedido com ID 99 não encontrado"));
@@ -283,5 +287,4 @@ public class PedidoControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Pedido com ID 99 não encontrado"));
     }
-
 }

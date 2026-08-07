@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -60,14 +60,12 @@ public class HistoricoCompraControllerTest {
                 historicoCompra.setTipoEvento("CRIADO");
                 historicoCompra.setDescricao("Pedido Criado");
 
-                // DTO de request para o POST
                 historicoSaveDTO = new HistoricoSaveDTO(
-                                0, // pedidoId (0 quando nao enviado pelo teste de controller)
+                                0,
                                 historicoCompra.getDescricao(),
                                 historicoCompra.getDataEvento(),
                                 historicoCompra.getTipoEvento());
 
-                // DTO de response que o service/controller retorna nas buscas
                 historicoResponseDTO = new HistoricoResponseDTO(
                                 historicoCompra.getId(),
                                 historicoCompra.getTipoEvento(),
@@ -77,6 +75,7 @@ public class HistoricoCompraControllerTest {
 
         @Test
         @DisplayName("POST /save - Deve salvar um HistoricoCompra com status CREATED")
+        @WithMockUser(roles = "ADMIN")
         void cenario01() throws Exception {
                 Mockito.when(historicoCompraService.save(any(HistoricoSaveDTO.class))).thenReturn(historicoCompra);
 
@@ -93,6 +92,7 @@ public class HistoricoCompraControllerTest {
 
         @Test
         @DisplayName("POST /save - Deve retornar BAD_REQUEST em caso de falha no serviço")
+        @WithMockUser(roles = "ADMIN")
         void cenario02() throws Exception {
                 Mockito.when(historicoCompraService.save(any(HistoricoSaveDTO.class)))
                                 .thenThrow(new RuntimeException("Erro de teste"));
@@ -108,6 +108,7 @@ public class HistoricoCompraControllerTest {
 
         @Test
         @DisplayName("PUT /update/{id} - Deve atualizar um HistoricoCompra com status OK")
+        @WithMockUser(roles = "ADMIN")
         void cenario03() throws Exception {
 
                 HistoricoCompra historicoAtualizado = new HistoricoCompra();
@@ -131,6 +132,7 @@ public class HistoricoCompraControllerTest {
 
         @Test
         @DisplayName("DELETE /delete/{id} - Deve deletar um HistoricoCompra com status NoContent")
+        @WithMockUser(roles = "ADMIN")
         void cenario04() throws Exception {
                 Mockito.when(historicoCompraService.delete(1)).thenReturn("Historico deletado com sucesso!");
 
@@ -141,6 +143,7 @@ public class HistoricoCompraControllerTest {
 
         @Test
         @DisplayName("DELETE /delete/{id} - Deve retornar BAD_REQUEST em caso de falha")
+        @WithMockUser(roles = "ADMIN")
         void cenario05() throws Exception {
                 final String expectedErrorMessage = "Falha ao tentar deletar o histórico.";
 
@@ -148,9 +151,7 @@ public class HistoricoCompraControllerTest {
                                 .thenThrow(new RuntimeException(expectedErrorMessage));
 
                 mockMvc.perform(delete("/historicoCompra/delete/1"))
-
                                 .andExpect(status().isBadRequest())
-
                                 .andExpect(content().string(expectedErrorMessage));
 
                 Mockito.verify(historicoCompraService, Mockito.times(1)).delete(1);

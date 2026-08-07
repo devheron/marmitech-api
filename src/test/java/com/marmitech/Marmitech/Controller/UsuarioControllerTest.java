@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,7 +32,6 @@ import com.marmitech.Marmitech.DTO.ResponseDTO.UsuarioResponseDTO;
 import com.marmitech.Marmitech.Entity.Usuario;
 import com.marmitech.Marmitech.Services.UsuarioService;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -77,6 +77,7 @@ class UsuarioControllerTest {
 
         @Test
         @DisplayName("01 - POST /save - Deve criar um novo usuario com sucesso")
+        @WithMockUser(roles = "ADMIN")
         void cenario01() throws Exception {
                 Mockito.when(usuarioService.save(any(UsuarioRequestDTO.class)))
                                 .thenReturn(usuarioResponse);
@@ -129,6 +130,7 @@ class UsuarioControllerTest {
 
         @Test
         @DisplayName("04-Cenario UP Deve atualizar os dados de um um usuario existente")
+        @WithMockUser(roles = "ADMIN")
         void cenario04() throws Exception {
                 Mockito.when(usuarioService.update(anyInt(), any(UsuarioRequestDTO.class)))
                                 .thenReturn(usuarioResponse);
@@ -149,6 +151,7 @@ class UsuarioControllerTest {
 
         @Test
         @DisplayName("05 - Cenario Delete - Deve excluir um usuário com sucesso")
+        @WithMockUser(roles = "ADMIN")
         void cenario05() throws Exception {
                 Mockito.doNothing().when(usuarioService).delete(anyInt());
 
