@@ -40,16 +40,19 @@ public class HistoricoCompraController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findById/{historicoCompraId}")
     public ResponseEntity<HistoricoResponseDTO> findById(@PathVariable int historicoCompraId) {
         return new ResponseEntity<>(historicoCompraService.findById(historicoCompraId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping
     public ResponseEntity<List<HistoricoResponseDTO>> findAll() {
         return new ResponseEntity<>(historicoCompraService.findAll(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findByDataEvento")
     public ResponseEntity<List<HistoricoResponseDTO>> findByDataEvento(@RequestParam String dataEvento) {
         return new ResponseEntity<>(historicoCompraService.findByDataEvento(dataEvento), HttpStatus.OK);

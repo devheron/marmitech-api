@@ -24,12 +24,14 @@ public class ClienteController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findAll")
     public ResponseEntity<List<ClienteResponseDTO>> findAll() {
         var result = clienteService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findById/{id}")
     public ResponseEntity<ClienteResponseDTO> findById(@PathVariable Integer id) {
         var result = clienteService.findById(id);
@@ -50,12 +52,14 @@ public class ClienteController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findByNome/{nome}")
     public ResponseEntity<List<ClienteResponseDTO>> findByNome(@PathVariable String nome) {
         var result = clienteService.findByNome(nome);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findByCpfCnpj/{cpf_cnpj}")
     public ResponseEntity<ClienteResponseDTO> findByCpfCnpj(@PathVariable String cpf_cnpj) {
         var result = clienteService.findByCpfCnpj(cpf_cnpj);

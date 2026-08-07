@@ -5,14 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.marmitech.Marmitech.DTO.RequestDTO.CategoriaRequestDTO;
 import com.marmitech.Marmitech.DTO.ResponseDTO.CategoriaResponseDTO;
@@ -34,12 +27,14 @@ public class CategoriaController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findAll")
     public ResponseEntity<List<CategoriaResponseDTO>> findAll() {
         var result = categoriaService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findById/{id}")
     public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Integer id) {
         var result = categoriaService.findById(id);

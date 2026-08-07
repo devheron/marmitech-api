@@ -33,12 +33,14 @@ public class UsuarioController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         var result = usuarioService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("findById/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer id) {
         var result = usuarioService.findById(id);
@@ -59,12 +61,14 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findByCargo/{cargo}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByCargo(@PathVariable String cargo) {
         var result = usuarioService.findByCargo(cargo);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findByNome/{nome}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByNome(@PathVariable String nome) {
         var result = usuarioService.findByNome(nome);

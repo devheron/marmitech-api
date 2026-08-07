@@ -28,11 +28,13 @@ public class ProdutoController {
         return new ResponseEntity<>(produto, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("/findAll")
     public ResponseEntity<List<ProdutoListaDTO>> findAll() {
         return new ResponseEntity<>(produtoService.findAll(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @GetMapping("findById/{id}")
     public ResponseEntity<ProdutoListaDTO> findById(@PathVariable Integer id) {
         var result = produtoService.findById(id);
