@@ -12,6 +12,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,6 +35,7 @@ import com.marmitech.Marmitech.Services.ProdutoService;
 
 
 @WebMvcTest(ProdutoController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class ProdutoControllerTest {
 
     @Autowired
@@ -102,7 +104,7 @@ public class ProdutoControllerTest {
 
         mockMvc.perform(delete("/api/produto/delete/{id}", 1))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
