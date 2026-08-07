@@ -1,3 +1,0 @@
-﻿DB_USER: "root"
-DB_URL: "jdbc:mysql:///marmitech?cloudSqlInstance=marmitech-504321:southamerica-east1:marmitech-database&socketFactory=com.google.cloud.sql.mysql.SocketFactory"
-CORS_ORIGINS: "https://marmitech-504321.web.app,http://localhost:4200"
