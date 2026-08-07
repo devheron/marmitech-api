@@ -92,15 +92,21 @@ public class PedidoService {
     @Transactional
     public Pedido update(Integer id, Pedido pedido) {
         Pedido pedidoUpdate = findById( id );
-        pedidoUpdate.setValorTotal( pedido.getValorTotal() );
-        pedidoUpdate.setStatus( pedido.getStatus() );
-        pedidoUpdate.setEnderecoEntrega( pedido.getEnderecoEntrega() );
-        pedidoUpdate.setUsuario( pedido.getUsuario() );
-        pedidoUpdate.setCliente( pedido.getCliente() );
 
-        if (pedido.getPedidoItems() != null && !pedido.getPedidoItems().isEmpty()) {
-            pedidoUpdate.getPedidoItems().clear();
-            pedido.getPedidoItems().forEach( pedidoUpdate::addItem );
+        if (pedido.getValorTotal() != null) {
+            pedidoUpdate.setValorTotal( pedido.getValorTotal() );
+        }
+        if (pedido.getStatus() != null && !pedido.getStatus().isBlank()) {
+            pedidoUpdate.setStatus( pedido.getStatus() );
+        }
+        if (pedido.getEnderecoEntrega() != null && !pedido.getEnderecoEntrega().isBlank()) {
+            pedidoUpdate.setEnderecoEntrega( pedido.getEnderecoEntrega() );
+        }
+        if (pedido.getUsuario() != null) {
+            pedidoUpdate.setUsuario( pedido.getUsuario() );
+        }
+        if (pedido.getCliente() != null) {
+            pedidoUpdate.setCliente( pedido.getCliente() );
         }
 
         return pedidoRepository.save( pedidoUpdate );
