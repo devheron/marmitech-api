@@ -2,6 +2,7 @@ package com.marmitech.Marmitech.Controller;
 
 import com.marmitech.Marmitech.Entity.Cliente;
 import com.marmitech.Marmitech.Repository.ClienteRepository;
+import com.marmitech.Marmitech.Security.JwUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,15 +26,25 @@ class ClienteControllerTest {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private JwUtil jwUtil;
+
     private Cliente cliente;
 
     @BeforeEach
     void setUp() {
+        // Gera um token real de ADMIN e anexa em toda requisição deste teste,
+        // já que aqui a chamada HTTP passa pela cadeia de filtros de verdade.
+        String token = jwUtil.generateToken("teste@marmitech.com", "ADMIN");
+
+        restTemplate.getRestTemplate().getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().add("Authorization", "Bearer " + token);
+            return execution.execute(request, body);
+        });
+
         clienteRepository.deleteAll();
 
         cliente = new Cliente();
-        // cliente.setId(1);
-
         cliente.setNome("Maria");
         cliente.setEmail("maria@exemplo.com");
         cliente.setTelefone("11999999999");
@@ -48,8 +59,6 @@ class ClienteControllerTest {
     @DisplayName("POST /save - Criar cliente com sucesso")
     void deveCriarCliente() {
         Cliente novo = new Cliente();
-        // novo.setId(1);
-
         novo.setNome("Ana");
         novo.setEmail("ana@exemplo.com");
         novo.setTelefone("11888888888");
@@ -112,7 +121,6 @@ class ClienteControllerTest {
     @Test
     @DisplayName("DELETE /delete/{id} - Deletar cliente existente com sucesso")
     void deveDeletarCliente() {
-        // envia requisição DELETE para o endpoint
         ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/cliente/delete/" + cliente.getId(),
                 HttpMethod.DELETE,

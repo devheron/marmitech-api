@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -18,7 +19,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,7 +27,6 @@ import com.marmitech.Marmitech.DTO.ResponseDTO.PedidoItemResponseDTO;
 import com.marmitech.Marmitech.Entity.PedidoItem;
 import com.marmitech.Marmitech.Services.PedidoItemService;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -71,6 +70,7 @@ public class PedidoItemControllerTest {
 
     @Test
     @DisplayName("Teste: Save PedidoItem Controller")
+    @WithMockUser(roles = "ADMIN")
     void test28() throws Exception {
         PedidoItemResponseDTO pedidoItem = new PedidoItemResponseDTO(1, 1, 1, "Cliente A", "Produto A", 19, 10.00,
                 10.00);
@@ -105,6 +105,7 @@ public class PedidoItemControllerTest {
 
     @Test
     @DisplayName("Teste: Delete PedidoItem Controller")
+    @WithMockUser(roles = "ADMIN")
     void test30() throws Exception {
         given(pedidoItemService.delete(1)).willReturn("Linha deleteda da tabela.");
 
@@ -115,6 +116,7 @@ public class PedidoItemControllerTest {
 
     @Test
     @DisplayName("Teste: Update PedidoItem Controller")
+    @WithMockUser(roles = "ADMIN")
     void test31() throws Exception {
         PedidoItemResponseDTO atualizadoPedidoItem = new PedidoItemResponseDTO(1, 1, 1, "Cliente A", "Produto A", 19,
                 10.00, 10.00);
@@ -131,5 +133,4 @@ public class PedidoItemControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andDo(print());
     }
-
 }

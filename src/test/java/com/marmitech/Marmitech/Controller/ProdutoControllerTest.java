@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -33,7 +34,6 @@ import com.marmitech.Marmitech.Entity.PedidoItem;
 import com.marmitech.Marmitech.Entity.Produto;
 import com.marmitech.Marmitech.Services.ProdutoService;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.marmitech.Marmitech.Security.JwtAuthFilter;
 import com.marmitech.Marmitech.Security.JwUtil;
 
@@ -92,6 +92,7 @@ public class ProdutoControllerTest {
 
     @Test
     @DisplayName("Teste: Save Produto Controller")
+    @WithMockUser(roles = "ADMIN")
     public void test24() throws Exception {
         ProdutoListaDTO produto1 = new ProdutoListaDTO(1, "Produto A", "Descrição A", 1, "Categoria A", "Hoje", 10.00,
                 10, "111");
@@ -110,6 +111,7 @@ public class ProdutoControllerTest {
 
     @Test
     @DisplayName("Teste: Delete Produto Controller")
+    @WithMockUser(roles = "ADMIN")
     public void test25() throws Exception {
         doNothing().when(produtoService).delete(1);
 
@@ -120,6 +122,7 @@ public class ProdutoControllerTest {
 
     @Test
     @DisplayName("Teste: Update Produto Controller")
+    @WithMockUser(roles = "ADMIN")
     public void test26() throws Exception {
         Set<PedidoItem> pedidoItem = new HashSet<>();
 
@@ -136,5 +139,4 @@ public class ProdutoControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-
 }
