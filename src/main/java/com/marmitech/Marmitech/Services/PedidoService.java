@@ -38,83 +38,88 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO save(PedidoRequestDTO dto) {
-        Pedido pedido = PedidoRequestMapper.toEntity( dto );
-        pedido.setDataPedido( LocalDate.now().toString() );
+        Pedido pedido = PedidoRequestMapper.toEntity(dto);
+        pedido.setDataPedido(LocalDate.now().toString());
 
         for (PedidoItem item : pedido.getPedidoItems()) {
-            Produto produto = produtoRepository.findById( item.getProduto().getId() )
-                    .orElseThrow( () -> new RuntimeException( "Produto não encontrado: " + item.getProduto().getId() ) );
+            Produto produto = produtoRepository.findById(item.getProduto().getId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + item.getProduto().getId()));
 
-            item.setProduto( produto );
-            item.setPedido( pedido );
+            item.setProduto(produto);
+            item.setPedido(pedido);
         }
 
         if (pedido.getCliente() != null && pedido.getCliente().getId() > 0) {
-            var cliente = clienteRepository.findById( pedido.getCliente().getId() )
-                    .orElseThrow( () -> new RuntimeException( "Cliente não encontrado" ) );
-            pedido.setCliente( cliente );
+            var cliente = clienteRepository.findById(pedido.getCliente().getId())
+                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+            pedido.setCliente(cliente);
         }
 
-        Pedido saved = pedidoRepository.save( pedido );
-        return PedidoResponseMapper.toDto( saved );
+        Pedido saved = pedidoRepository.save(pedido);
+        return PedidoResponseMapper.toDto(saved);
     }
 
     public List<PedidoResponseDTO> findAll() {
         return pedidoRepository
                 .findAll()
                 .stream()
-                .map( PedidoResponseMapper::toDto )
+                .map(PedidoResponseMapper::toDto)
                 .toList();
     }
 
     public Pedido findById(Integer id) {
         if (id < 0) {
-            throw new IllegalArgumentException( "ID DO PEDIDO INVALIDO" );
+            throw new IllegalArgumentException("ID DO PEDIDO INVALIDO");
         }
-        return pedidoRepository.findById( id ).orElseThrow( () -> new RuntimeException( "Pedido com ID " + id + " não encontrado" ) );
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido com ID " + id + " não encontrado"));
     }
 
     public List<Pedido> findByStatus(String status) {
-        return pedidoRepository.findByStatus( status );
+        return pedidoRepository.findByStatus(status);
     }
 
     public List<Pedido> findByProduto(int produtoId) {
         Produto produto = new Produto();
-        produto.setId( produtoId );
+        produto.setId(produtoId);
 
-        return pedidoRepository.findByPedidoItemsProduto( produto );
+        return pedidoRepository.findByPedidoItemsProduto(produto);
     }
 
     public List<Pedido> findByProdutoNome(String nomeProduto) {
-        return pedidoRepository.findByPedidoItemsProdutoNome( nomeProduto );
+        return pedidoRepository.findByPedidoItemsProdutoNome(nomeProduto);
     }
 
     @Transactional
     public Pedido update(Integer id, Pedido pedido) {
-        Pedido pedidoUpdate = findById( id );
+        Pedido pedidoUpdate = findById(id);
 
         if (pedido.getValorTotal() != null) {
-            pedidoUpdate.setValorTotal( pedido.getValorTotal() );
+            pedidoUpdate.setValorTotal(pedido.getValorTotal());
         }
         if (pedido.getStatus() != null && !pedido.getStatus().isBlank()) {
-            pedidoUpdate.setStatus( pedido.getStatus() );
+            pedidoUpdate.setStatus(pedido.getStatus());
         }
         if (pedido.getEnderecoEntrega() != null && !pedido.getEnderecoEntrega().isBlank()) {
-            pedidoUpdate.setEnderecoEntrega( pedido.getEnderecoEntrega() );
+            pedidoUpdate.setEnderecoEntrega(pedido.getEnderecoEntrega());
         }
         if (pedido.getUsuario() != null) {
-            pedidoUpdate.setUsuario( pedido.getUsuario() );
+            pedidoUpdate.setUsuario(pedido.getUsuario());
         }
         if (pedido.getCliente() != null) {
-            pedidoUpdate.setCliente( pedido.getCliente() );
+            pedidoUpdate.setCliente(pedido.getCliente());
         }
 
-        return pedidoRepository.save( pedidoUpdate );
+        return pedidoRepository.save(pedidoUpdate);
+    }
+
+    public List<Pedido> findByClienteEmail(String email) {
+        return pedidoRepository.findByClienteEmail(email);
     }
 
     @Transactional
     public void delete(Integer id) {
-        var delete = findById( id );
-        pedidoRepository.delete( delete );
+        var delete = findById(id);
+        pedidoRepository.delete(delete);
     }
 }
