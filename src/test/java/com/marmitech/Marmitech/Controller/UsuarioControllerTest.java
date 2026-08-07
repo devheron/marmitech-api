@@ -31,175 +31,183 @@ import com.marmitech.Marmitech.DTO.ResponseDTO.UsuarioResponseDTO;
 import com.marmitech.Marmitech.Entity.Usuario;
 import com.marmitech.Marmitech.Services.UsuarioService;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import com.marmitech.Marmitech.Security.JwtAuthFilter;
+import com.marmitech.Marmitech.Security.JwUtil;
+
 @WebMvcTest(UsuarioController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class UsuarioControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+        @Autowired
+        MockMvc mockMvc;
 
-    @MockitoBean
-    private UsuarioService usuarioService;
+        @MockitoBean
+        private UsuarioService usuarioService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    UsuarioResponseDTO usuarioResponse;
+        @MockitoBean
+        private JwtAuthFilter jwtAuthFilter;
 
-    UsuarioRequestDTO usuarioRequest;
+        @MockitoBean
+        private JwUtil jwUtil;
 
-    @BeforeEach
-    void setUp() {
-        usuarioResponse = new UsuarioResponseDTO(
-                1,
-                "Marmitech",
-                "marmitech@gmail.com",
-                "Caixa",
-                LocalDate.now()
-        );
+        UsuarioResponseDTO usuarioResponse;
 
-        usuarioRequest = new UsuarioRequestDTO(
-                "Marmitech",
-                "marmitech@gmail.com",
-                "123456",
-                "Caixa"
-        );
-    }
+        UsuarioRequestDTO usuarioRequest;
 
-    @Test
-    @DisplayName("01 - POST /save - Deve criar um novo usuario com sucesso")
-    void cenario01() throws Exception {
-        Mockito.when(usuarioService.save(any(UsuarioRequestDTO.class)))
-                .thenReturn(usuarioResponse);
+        @BeforeEach
+        void setUp() {
+                usuarioResponse = new UsuarioResponseDTO(
+                                1,
+                                "Marmitech",
+                                "marmitech@gmail.com",
+                                "Caixa",
+                                LocalDate.now());
 
-        String usuarioJson = objectMapper.writeValueAsString(usuarioRequest);
+                usuarioRequest = new UsuarioRequestDTO(
+                                "Marmitech",
+                                "marmitech@gmail.com",
+                                "123456",
+                                "Caixa");
+        }
 
-        mockMvc.perform(post("/api/usuario/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(usuarioJson))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nome").value("Marmitech"))
-                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$.cargo").value("Caixa"))
-                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
-    }
+        @Test
+        @DisplayName("01 - POST /save - Deve criar um novo usuario com sucesso")
+        void cenario01() throws Exception {
+                Mockito.when(usuarioService.save(any(UsuarioRequestDTO.class)))
+                                .thenReturn(usuarioResponse);
 
-    @Test
-    @DisplayName("02 - GET /findAll - Deve retornar a lista de usuario cadastrados")
-    void cenario02() throws Exception {
-        Mockito.when(usuarioService.findAll())
-                .thenReturn(List.of(usuarioResponse));
+                String usuarioJson = objectMapper.writeValueAsString(usuarioRequest);
 
-        mockMvc.perform(get("/api/usuario/findAll"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
-                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
-                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
-    }
+                mockMvc.perform(post("/api/usuario/save")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(usuarioJson))
+                                .andDo(print())
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.id").value(1))
+                                .andExpect(jsonPath("$.nome").value("Marmitech"))
+                                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$.cargo").value("Caixa"))
+                                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
+        }
 
-    @Test
-    @DisplayName("03 - GET /findById - Buscar usuário pelo ID")
-    void cenario03() throws Exception {
-        Mockito.when(usuarioService.findById(anyInt()))
-                .thenReturn(usuarioResponse);
+        @Test
+        @DisplayName("02 - GET /findAll - Deve retornar a lista de usuario cadastrados")
+        void cenario02() throws Exception {
+                Mockito.when(usuarioService.findAll())
+                                .thenReturn(List.of(usuarioResponse));
 
-        mockMvc.perform(get("/api/usuario/findById/{id}", 1))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nome").value("Marmitech"))
-                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$.cargo").value("Caixa"))
-                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
-    }
+                mockMvc.perform(get("/api/usuario/findAll"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").value(1))
+                                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
+                                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
+                                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
+        }
 
-    @Test
-    @DisplayName("04-Cenario UP Deve atualizar os dados de um um usuario existente")
-    void cenario04() throws Exception {
-        Mockito.when(usuarioService.update(anyInt(), any(UsuarioRequestDTO.class)))
-                .thenReturn(usuarioResponse);
+        @Test
+        @DisplayName("03 - GET /findById - Buscar usuário pelo ID")
+        void cenario03() throws Exception {
+                Mockito.when(usuarioService.findById(anyInt()))
+                                .thenReturn(usuarioResponse);
 
-        String usuarioJson = objectMapper.writeValueAsString(usuarioRequest);
+                mockMvc.perform(get("/api/usuario/findById/{id}", 1))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(1))
+                                .andExpect(jsonPath("$.nome").value("Marmitech"))
+                                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$.cargo").value("Caixa"))
+                                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
+        }
 
-        mockMvc.perform(put("/api/usuario/update/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(usuarioJson))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nome").value("Marmitech"))
-                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$.cargo").value("Caixa"))
-                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
-    }
+        @Test
+        @DisplayName("04-Cenario UP Deve atualizar os dados de um um usuario existente")
+        void cenario04() throws Exception {
+                Mockito.when(usuarioService.update(anyInt(), any(UsuarioRequestDTO.class)))
+                                .thenReturn(usuarioResponse);
 
-    @Test
-    @DisplayName("05 - Cenario Delete - Deve excluir um usuário com sucesso")
-    void cenario05() throws Exception {
-        Mockito.doNothing().when(usuarioService).delete(anyInt());
+                String usuarioJson = objectMapper.writeValueAsString(usuarioRequest);
 
-        mockMvc.perform(delete("/api/usuario/delete/{id}", 1))
-                .andDo(print())
-                .andExpect(status().isNoContent());
-    }
+                mockMvc.perform(put("/api/usuario/update/{id}", 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(usuarioJson))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(1))
+                                .andExpect(jsonPath("$.nome").value("Marmitech"))
+                                .andExpect(jsonPath("$.email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$.cargo").value("Caixa"))
+                                .andExpect(jsonPath("$.dataCriacao").value(LocalDate.now().toString()));
+        }
 
-    @Test
-@DisplayName("06 - Cenario  Deve fazer login com sucesso")
-void cenario06() throws Exception {
-    Usuario usuarioLogado = new Usuario();
-    usuarioLogado.setId(1);
-    usuarioLogado.setNome("Marmitech");
-    usuarioLogado.setEmail("marmitech@gmail.com");
-    usuarioLogado.setSenha("123456");
-    usuarioLogado.setCargo("Caixa");
-    usuarioLogado.setDataCriacao(LocalDate.now());
+        @Test
+        @DisplayName("05 - Cenario Delete - Deve excluir um usuário com sucesso")
+        void cenario05() throws Exception {
+                Mockito.doNothing().when(usuarioService).delete(anyInt());
 
-    Mockito.when(usuarioService.login(anyString(), anyString())).thenReturn(usuarioLogado);
+                mockMvc.perform(delete("/api/usuario/delete/{id}", 1))
+                                .andDo(print())
+                                .andExpect(status().isNoContent());
+        }
 
-    Usuario loginPayload = new Usuario();
-    loginPayload.setEmail("marmitech@gmail.com");
-    loginPayload.setSenha("123456");
+        @Test
+        @DisplayName("06 - Cenario  Deve fazer login com sucesso")
+        void cenario06() throws Exception {
+                Usuario usuarioLogado = new Usuario();
+                usuarioLogado.setId(1);
+                usuarioLogado.setNome("Marmitech");
+                usuarioLogado.setEmail("marmitech@gmail.com");
+                usuarioLogado.setSenha("123456");
+                usuarioLogado.setCargo("Caixa");
+                usuarioLogado.setDataCriacao(LocalDate.now());
 
-    mockMvc.perform(post("/api/usuario/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(loginPayload)))
-            .andDo(print())
-            .andExpect(status().isOk());
-}
+                Mockito.when(usuarioService.login(anyString(), anyString())).thenReturn(usuarioLogado);
 
-    @Test
-    @DisplayName("07 - Cenario  Deve buscar usuários pelo cargo")
-    void cenario07() throws Exception {
-        Mockito.when(usuarioService.findByCargo(anyString())).thenReturn(List.of(usuarioResponse));
+                Usuario loginPayload = new Usuario();
+                loginPayload.setEmail("marmitech@gmail.com");
+                loginPayload.setSenha("123456");
 
-        mockMvc.perform(get("/api/usuario/findByCargo/{cargo}", "Caixa"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
-                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
-                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
-    }
+                mockMvc.perform(post("/api/usuario/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(loginPayload)))
+                                .andDo(print())
+                                .andExpect(status().isOk());
+        }
 
-    @Test
-    @DisplayName("08 - Cenario ")
-    void cenario08() throws Exception {
-        Mockito.when(usuarioService.findByNome(anyString())).thenReturn(List.of(usuarioResponse));
+        @Test
+        @DisplayName("07 - Cenario  Deve buscar usuários pelo cargo")
+        void cenario07() throws Exception {
+                Mockito.when(usuarioService.findByCargo(anyString())).thenReturn(List.of(usuarioResponse));
 
-        mockMvc.perform(get("/api/usuario/findByNome/{nome}", "Marmitech"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
-                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
-                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
-                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
-    }
+                mockMvc.perform(get("/api/usuario/findByCargo/{cargo}", "Caixa"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").value(1))
+                                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
+                                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
+                                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
+        }
+
+        @Test
+        @DisplayName("08 - Cenario ")
+        void cenario08() throws Exception {
+                Mockito.when(usuarioService.findByNome(anyString())).thenReturn(List.of(usuarioResponse));
+
+                mockMvc.perform(get("/api/usuario/findByNome/{nome}", "Marmitech"))
+                                .andDo(print())
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").value(1))
+                                .andExpect(jsonPath("$[0].nome").value("Marmitech"))
+                                .andExpect(jsonPath("$[0].email").value("marmitech@gmail.com"))
+                                .andExpect(jsonPath("$[0].cargo").value("Caixa"))
+                                .andExpect(jsonPath("$[0].dataCriacao").value(LocalDate.now().toString()));
+        }
 }

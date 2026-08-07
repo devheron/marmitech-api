@@ -32,7 +32,7 @@ class ClienteControllerTest {
         clienteRepository.deleteAll();
 
         cliente = new Cliente();
-       // cliente.setId(1);
+        // cliente.setId(1);
 
         cliente.setNome("Maria");
         cliente.setEmail("maria@exemplo.com");
@@ -43,7 +43,7 @@ class ClienteControllerTest {
         clienteRepository.save(cliente);
     }
 
-    //  CENÁRIO 1 - POST
+    // CENÁRIO 1 - POST
     @Test
     @DisplayName("POST /save - Criar cliente com sucesso")
     void deveCriarCliente() {
@@ -56,7 +56,6 @@ class ClienteControllerTest {
         novo.setEndereco("Av. Brasil, 456");
         novo.setCpfCnpj("111222333448");
         novo.setDataCadastro(LocalDate.now().toString());
-
 
         ResponseEntity<Cliente> response = restTemplate.postForEntity("/api/cliente/save", novo, Cliente.class);
 
@@ -72,14 +71,15 @@ class ClienteControllerTest {
         ResponseEntity<Cliente[]> response = restTemplate.getForEntity("/api/cliente/findAll", Cliente[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-       assertNotNull(response.getBody().length > 0);
+        assertNotNull(response.getBody().length > 0);
     }
 
     // CENÁRIO 3 - GET /findById/{id}
     @Test
     @DisplayName("GET /findById - Buscar cliente por ID existente")
     void deveBuscarPorId() {
-        ResponseEntity<Cliente> response = restTemplate.getForEntity("/api/cliente/findById/" + cliente.getId(), Cliente.class);
+        ResponseEntity<Cliente> response = restTemplate.getForEntity("/api/cliente/findById/" + cliente.getId(),
+                Cliente.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -101,8 +101,7 @@ class ClienteControllerTest {
                 "/api/cliente/update/" + cliente.getId(),
                 HttpMethod.PUT,
                 request,
-                Cliente.class
-        );
+                Cliente.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -118,22 +117,20 @@ class ClienteControllerTest {
                 "/api/cliente/delete/" + cliente.getId(),
                 HttpMethod.DELETE,
                 null,
-                Void.class
-        );
-
+                Void.class);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-
 
         boolean existe = clienteRepository.findById(cliente.getId()).isPresent();
         assertFalse(existe, "O cliente ainda existe no banco após o delete!");
     }
 
-    //  CENÁRIO 6 - GET /findByNome/{nome}
+    // CENÁRIO 6 - GET /findByNome/{nome}
     @Test
     @DisplayName("GET /findByNome - Buscar cliente pelo nome")
     void deveBuscarPorNome() {
-        ResponseEntity<Cliente[]> response = restTemplate.getForEntity("/api/cliente/findByNome/Maria", Cliente[].class);
+        ResponseEntity<Cliente[]> response = restTemplate.getForEntity("/api/cliente/findByNome/Maria",
+                Cliente[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -144,7 +141,8 @@ class ClienteControllerTest {
     @Test
     @DisplayName("GET /findByCpfCnpj - Buscar cliente pelo CPF/CNPJ")
     void deveBuscarPorCpfCnpj() {
-        ResponseEntity<Cliente> response = restTemplate.getForEntity("/api/cliente/findByCpfCnpj/" + cliente.getCpfCnpj(), Cliente.class);
+        ResponseEntity<Cliente> response = restTemplate
+                .getForEntity("/api/cliente/findByCpfCnpj/" + cliente.getCpfCnpj(), Cliente.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
