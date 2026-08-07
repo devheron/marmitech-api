@@ -1,4 +1,5 @@
 package com.marmitech.Marmitech.Controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marmitech.Marmitech.DTO.RequestDTO.CategoriaRequestDTO;
 import com.marmitech.Marmitech.DTO.ResponseDTO.CategoriaResponseDTO;
@@ -28,87 +29,101 @@ import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.mockito.ArgumentMatchers.eq;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import com.marmitech.Marmitech.Security.JwtAuthFilter;
+import com.marmitech.Marmitech.Security.JwUtil;
 
 @WebMvcTest(CategoriaController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class CategoriaControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-    @MockitoBean
-    CategoriaService categoriaService;
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        MockMvc mockMvc;
+        @MockitoBean
+        CategoriaService categoriaService;
+        @Autowired
+        private ObjectMapper objectMapper;
 
+        @MockitoBean
+        private JwtAuthFilter jwtAuthFilter;
 
-    @Test
-   @DisplayName("Deve retornar a lista de categorias com sucesso")
-    void buscarcategorias() throws Exception {
-       CategoriaResponseDTO categoria1 = new CategoriaResponseDTO(null, "Marmitex", "Marmita Grande");
-       CategoriaResponseDTO categoria2 = new CategoriaResponseDTO(null, "Porcao torresmo", "Porcao torresmo 350g");
+        @MockitoBean
+        private JwUtil jwUtil;
 
-       List<CategoriaResponseDTO> listadeCategorias = Arrays.asList(categoria1, categoria2);
+        @Test
+        @DisplayName("Deve retornar a lista de categorias com sucesso")
+        void buscarcategorias() throws Exception {
+                CategoriaResponseDTO categoria1 = new CategoriaResponseDTO(null, "Marmitex", "Marmita Grande");
+                CategoriaResponseDTO categoria2 = new CategoriaResponseDTO(null, "Porcao torresmo",
+                                "Porcao torresmo 350g");
 
-       when(categoriaService.findAll()).thenReturn(listadeCategorias);
+                List<CategoriaResponseDTO> listadeCategorias = Arrays.asList(categoria1, categoria2);
 
-       mockMvc.perform(get("/api/categoria/findAll"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].nome", is("Marmitex")))
-               .andExpect(jsonPath("$[1].nome", is("Porcao torresmo")));
+                when(categoriaService.findAll()).thenReturn(listadeCategorias);
 
-   }
-   @Test
-   @DisplayName("deve salvar uma categoria")
-   void salvarcategoria() throws Exception{
-        CategoriaResponseDTO categoriaSalva = new CategoriaResponseDTO(1, "Marmitas", "Marmitas variadas");
+                mockMvc.perform(get("/api/categoria/findAll"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].nome", is("Marmitex")))
+                                .andExpect(jsonPath("$[1].nome", is("Porcao torresmo")));
 
-        when(categoriaService.save(any(CategoriaRequestDTO.class))).thenReturn(categoriaSalva);
+        }
 
-        String jsonEnviado = objectMapper.writeValueAsString(new CategoriaRequestDTO("Marmitas", "Marmitas variadas"));
+        @Test
+        @DisplayName("deve salvar uma categoria")
+        void salvarcategoria() throws Exception {
+                CategoriaResponseDTO categoriaSalva = new CategoriaResponseDTO(1, "Marmitas", "Marmitas variadas");
 
-        mockMvc.perform(post("/api/categoria/save").contentType(MediaType.APPLICATION_JSON)
-                .content(jsonEnviado)).andExpect(status().isCreated()).andExpect(jsonPath("$.id",is(1))).andExpect(jsonPath("$.nome",is("Marmitas"))).andExpect(jsonPath("$.descricao",is("Marmitas variadas")));
+                when(categoriaService.save(any(CategoriaRequestDTO.class))).thenReturn(categoriaSalva);
 
-   }
-    @Test
-    @DisplayName("Deve deletar uma categoria com sucesso")
-    void DeletarCategoriaComSucesso() throws Exception {
+                String jsonEnviado = objectMapper
+                                .writeValueAsString(new CategoriaRequestDTO("Marmitas", "Marmitas variadas"));
 
-        Integer idParaDeletar = Math.toIntExact(1);
+                mockMvc.perform(post("/api/categoria/save").contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonEnviado)).andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.id", is(1))).andExpect(jsonPath("$.nome", is("Marmitas")))
+                                .andExpect(jsonPath("$.descricao", is("Marmitas variadas")));
 
-        doNothing().when(categoriaService).delete(idParaDeletar);
+        }
 
-        mockMvc.perform(delete("/api/categoria/delete/{id}", idParaDeletar))
+        @Test
+        @DisplayName("Deve deletar uma categoria com sucesso")
+        void DeletarCategoriaComSucesso() throws Exception {
 
-                .andExpect(status().isNoContent());
+                Integer idParaDeletar = Math.toIntExact(1);
 
+                doNothing().when(categoriaService).delete(idParaDeletar);
 
+                mockMvc.perform(delete("/api/categoria/delete/{id}", idParaDeletar))
 
-        verify(categoriaService, times(1)).delete(idParaDeletar);
-    }
+                                .andExpect(status().isNoContent());
 
-    @Test
-    @DisplayName("Deve atualizar uma categoria com sucesso")
-    void deveAtualizarCategoriaComSucesso() throws Exception {
+                verify(categoriaService, times(1)).delete(idParaDeletar);
+        }
 
-        Integer idParaAtualizar = 1;
+        @Test
+        @DisplayName("Deve atualizar uma categoria com sucesso")
+        void deveAtualizarCategoriaComSucesso() throws Exception {
 
-        CategoriaResponseDTO categoriaAtualizadaRetornada = new CategoriaResponseDTO(idParaAtualizar, "Marmitex Atualizada", "Descricao Atualizada");
+                Integer idParaAtualizar = 1;
 
-        when(categoriaService.update(eq(idParaAtualizar), any(CategoriaRequestDTO.class)))
-                .thenReturn(categoriaAtualizadaRetornada);
+                CategoriaResponseDTO categoriaAtualizadaRetornada = new CategoriaResponseDTO(idParaAtualizar,
+                                "Marmitex Atualizada", "Descricao Atualizada");
 
-        String jsonParaEnviar = objectMapper.writeValueAsString(new CategoriaRequestDTO("Marmitex Atualizada", "Descricao Atualizada"));
+                when(categoriaService.update(eq(idParaAtualizar), any(CategoriaRequestDTO.class)))
+                                .thenReturn(categoriaAtualizadaRetornada);
 
-        mockMvc.perform(put("/api/categoria/update/{id}", idParaAtualizar)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonParaEnviar))
+                String jsonParaEnviar = objectMapper.writeValueAsString(
+                                new CategoriaRequestDTO("Marmitex Atualizada", "Descricao Atualizada"));
 
-                .andExpect(status().isOk())
+                mockMvc.perform(put("/api/categoria/update/{id}", idParaAtualizar)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonParaEnviar))
 
-                .andExpect(jsonPath("$.id", is(idParaAtualizar.intValue())))
-                .andExpect(jsonPath("$.nome", is("Marmitex Atualizada")))
-                .andExpect(jsonPath("$.descricao", is("Descricao Atualizada")));
-    }
+                                .andExpect(status().isOk())
+
+                                .andExpect(jsonPath("$.id", is(idParaAtualizar.intValue())))
+                                .andExpect(jsonPath("$.nome", is("Marmitex Atualizada")))
+                                .andExpect(jsonPath("$.descricao", is("Descricao Atualizada")));
+        }
 }

@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.marmitech.Marmitech.DTO.ResponseDTO.LoginResponseDTO;
+import com.marmitech.Marmitech.Security.JwUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -19,53 +22,62 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    @Autowired
+    private JwUtil jwUtil;
+
     @PostMapping("/save")
     public ResponseEntity<UsuarioResponseDTO> save(@RequestBody @Valid UsuarioRequestDTO dto) {
-        var result = usuarioService.save( dto );
-        return new ResponseEntity<>( result, HttpStatus.CREATED );
+        var result = usuarioService.save(dto);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @GetMapping("/findAll")
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         var result = usuarioService.findAll();
-        return new ResponseEntity<>( result, HttpStatus.OK );
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("findById/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer id) {
-        var result = usuarioService.findById( id );
-        return new ResponseEntity<>( result, HttpStatus.OK );
+        var result = usuarioService.findById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Integer id, @RequestBody UsuarioRequestDTO dto) {
-        var result = usuarioService.update( id, dto );
-        return new ResponseEntity<>( result, HttpStatus.OK );
+        var result = usuarioService.update(id, dto);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        usuarioService.delete( id );
-        return new ResponseEntity<>( HttpStatus.NO_CONTENT );
+        usuarioService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/findByCargo/{cargo}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByCargo(@PathVariable String cargo) {
-        var result = usuarioService.findByCargo( cargo );
-        return new ResponseEntity<>( result, HttpStatus.OK );
+        var result = usuarioService.findByCargo(cargo);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findByNome/{nome}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByNome(@PathVariable String nome) {
-        var result = usuarioService.findByNome( nome );
-        return new ResponseEntity<>( result, HttpStatus.OK );
+        var result = usuarioService.findByNome(nome);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario loginData) {
         try {
             var usuario = usuarioService.login(loginData.getEmail(), loginData.getSenha());
-            return ResponseEntity.ok(usuario);
+            String token = jwUtil.generateToken(usuario.getEmail(), usuario.getCargo());
+            return ResponseEntity.ok(new LoginResponseDTO(
+                    token,
+                    usuario.getId(),
+                    usuario.getNome(),
+                    usuario.getEmail(),
+                    usuario.getCargo()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }

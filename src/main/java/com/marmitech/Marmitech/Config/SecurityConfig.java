@@ -14,6 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.marmitech.Marmitech.Security.JwtAuthFilter;
+import com.marmitech.Marmitech.Security.JwUtil;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import java.util.*;
 
 @Configuration
@@ -23,6 +27,12 @@ public class SecurityConfig {
 
     @Value("${app.cors.origins}")
     private String corsOrigins;
+
+    private final JwUtil jwUtil;
+
+    public SecurityConfig(JwUtil jwUtil) {
+        this.jwUtil = jwUtil;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll());
-
+        http.addFilterBefore(new JwtAuthFilter(jwUtil), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -57,4 +67,3 @@ public class SecurityConfig {
         return source;
     }
 }
-

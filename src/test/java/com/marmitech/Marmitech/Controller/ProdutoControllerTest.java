@@ -33,6 +33,9 @@ import com.marmitech.Marmitech.Entity.PedidoItem;
 import com.marmitech.Marmitech.Entity.Produto;
 import com.marmitech.Marmitech.Services.ProdutoService;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import com.marmitech.Marmitech.Security.JwtAuthFilter;
+import com.marmitech.Marmitech.Security.JwUtil;
 
 @WebMvcTest(ProdutoController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -46,14 +49,21 @@ public class ProdutoControllerTest {
 
     @MockitoBean
     ProdutoService produtoService;
-    
+
+    @MockitoBean
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockitoBean
+    private JwUtil jwUtil;
 
     @Test
     @DisplayName("Teste: Find All Produtos Controller")
     public void test22() throws Exception {
 
-        ProdutoListaDTO produto1 = new ProdutoListaDTO(1, "Produto A", "Descrição A", 1, "Categoria A", "Hoje", 10.00, 10, "111");
-        ProdutoListaDTO produto2 = new ProdutoListaDTO(2, "Produto B", "Descrição B", 2, "Categoria B", "Hoje", 20.00, 20, "222");
+        ProdutoListaDTO produto1 = new ProdutoListaDTO(1, "Produto A", "Descrição A", 1, "Categoria A", "Hoje", 10.00,
+                10, "111");
+        ProdutoListaDTO produto2 = new ProdutoListaDTO(2, "Produto B", "Descrição B", 2, "Categoria B", "Hoje", 20.00,
+                20, "222");
         List<ProdutoListaDTO> produtos = Arrays.asList(produto1, produto2);
 
         given(produtoService.findAll()).willReturn(produtos);
@@ -83,7 +93,8 @@ public class ProdutoControllerTest {
     @Test
     @DisplayName("Teste: Save Produto Controller")
     public void test24() throws Exception {
-        ProdutoListaDTO produto1 = new ProdutoListaDTO(1, "Produto A", "Descrição A", 1, "Categoria A", "Hoje", 10.00, 10, "111");
+        ProdutoListaDTO produto1 = new ProdutoListaDTO(1, "Produto A", "Descrição A", 1, "Categoria A", "Hoje", 10.00,
+                10, "111");
         ProdutoSaveDTO produto2 = new ProdutoSaveDTO("Produto A", "Descrição A", 1, 10, 10.00, "111");
 
         given(produtoService.save(any(ProdutoSaveDTO.class))).willReturn(produto1);
@@ -94,7 +105,7 @@ public class ProdutoControllerTest {
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nome").value("Produto A"));  
+                .andExpect(jsonPath("$.nome").value("Produto A"));
     }
 
     @Test
