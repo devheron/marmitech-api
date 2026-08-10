@@ -19,13 +19,13 @@ public class PedidoItemController {
     @Autowired
     private PedidoItemService pedidoItemService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @PostMapping("/save")
     public ResponseEntity<PedidoItem> save(@RequestBody @Valid PedidoItemResponseDTO pedidoItem) {
         return new ResponseEntity<>(pedidoItemService.save(pedidoItem), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @PutMapping("/update/{pedidoItemId}")
     public ResponseEntity<PedidoItem> update(@RequestBody PedidoItemResponseDTO pedidoItem,
             @PathVariable int pedidoItemId) {

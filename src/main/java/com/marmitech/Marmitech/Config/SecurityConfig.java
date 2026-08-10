@@ -48,9 +48,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário não logado ou login inválido"))
-                )
+                        .authenticationEntryPoint((request, response, authException) -> response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED, "Usuário não logado ou login inválido")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/usuario/login").permitAll()
@@ -62,12 +61,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/usuario/**").hasRole("ADMIN")
 
                         // escrita: admin apenas
-                        .requestMatchers(HttpMethod.POST,   "/api/produto/**", "/api/categoria/**", "/api/cliente/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,    "/api/produto/**", "/api/categoria/**", "/api/cliente/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/produto/**", "/api/categoria/**", "/api/cliente/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/produto/**", "/api/categoria/**", "/api/cliente/**")
+                        .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
 
-                        // status do pedido: funcionario pode
-                        .requestMatchers(HttpMethod.PUT, "/api/pedido/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        // criacao e edicao de pedidos / itens: admin e funcionario
+                        .requestMatchers(HttpMethod.POST, "/api/pedido/**", "/pedidoItem/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        .requestMatchers(HttpMethod.PUT, "/api/pedido/**", "/pedidoItem/**").hasAnyRole("ADMIN", "FUNCIONARIO")
 
                         // leitura: admin e funcionario
                         .requestMatchers(HttpMethod.GET, "/**").hasAnyRole("ADMIN", "FUNCIONARIO")

@@ -14,7 +14,6 @@ import com.marmitech.Marmitech.Entity.Pedido;
 import com.marmitech.Marmitech.Mapper.ResponseMapper.PedidoResponseMapper;
 import com.marmitech.Marmitech.Services.PedidoService;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
@@ -23,7 +22,7 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @PostMapping("/save")
     public ResponseEntity<PedidoResponseDTO> save(@RequestBody PedidoRequestDTO dto) {
         return new ResponseEntity<>(pedidoService.save(dto), HttpStatus.CREATED);
@@ -65,7 +64,7 @@ public class PedidoController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
     @PutMapping("/update/{id}")
     public ResponseEntity<PedidoResponseDTO> update(@PathVariable Integer id, @RequestBody Pedido pedido) {
         Pedido updatedPedido = pedidoService.update(id, pedido);
@@ -76,11 +75,11 @@ public class PedidoController {
     @GetMapping("/meus")
     public ResponseEntity<List<PedidoResponseDTO>> meusPedidos() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<PedidoResponseDTO> pedidos = pedidoService.findByClienteEmail( email )
+        List<PedidoResponseDTO> pedidos = pedidoService.findByClienteEmail(email)
                 .stream()
-                .map( PedidoResponseMapper::toDto )
+                .map(PedidoResponseMapper::toDto)
                 .toList();
-        return new ResponseEntity<>( pedidos, HttpStatus.OK );
+        return new ResponseEntity<>(pedidos, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
