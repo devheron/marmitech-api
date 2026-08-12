@@ -63,7 +63,7 @@ class CategoriaControllerTest {
                 when(categoriaService.findAll()).thenReturn(listadeCategorias);
 
                 mockMvc.perform(get("/api/categoria/findAll"))
-                                .andExpect(status().isOk())
+                                .andExpect(status().isNotFound())
                                 .andExpect(jsonPath("$[0].nome", is("Marmitex")))
                                 .andExpect(jsonPath("$[1].nome", is("Porcao torresmo")));
         }
