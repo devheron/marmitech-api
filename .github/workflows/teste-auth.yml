@@ -1,0 +1,22 @@
+name: Teste de autenticacao GCP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Autenticar no Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configurar gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Listar servicos do Cloud Run
+        run: gcloud run services list --region=southamerica-east1
+
+      - name: Listar imagens no Artifact Registry
+        run: gcloud artifacts docker images list southamerica-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy --limit=5
