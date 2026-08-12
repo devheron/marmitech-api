@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/usuario/login").permitAll()
+                        .requestMatchers("/health").permitAll()
 
                         // area do cliente
                         .requestMatchers("/api/pedido/meus/**").hasAnyRole("CLIENTE", "ADMIN")

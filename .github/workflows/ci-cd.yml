@@ -1,0 +1,110 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  GCP_REGION: southamerica-east1
+  GCP_SERVICE: marmitech-api
+  HEALTH_PATH: /health
+  AR_REPO: cloud-run-source-deploy
+
+jobs:
+  # BUILD E OS TESTES
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build e testes (falha de teste interrompe aqui)
+        run: mvn --batch-mode --no-transfer-progress clean package
+
+      - name: Publicar relatório JaCoCo
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Publicar artefato da aplicação (jar)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+          retention-days: 7
+
+  # DEPLOY NA GCP
+  deploy:
+    name: deploy
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Autenticar no Google Cloud (chave de service account)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configurar gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Autenticar Docker no Artifact Registry
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+      - name: Definir tag da imagem
+        id: image
+        run: echo "tag=${GCP_REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/${GCP_SERVICE}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Build da imagem (Dockerfile próprio)
+        run: docker build -t "${{ steps.image.outputs.tag }}" .
+
+      - name: Push da imagem para o Artifact Registry
+        run: docker push "${{ steps.image.outputs.tag }}"
+
+      - name: Deploy no Cloud Run
+        run: |
+          gcloud run deploy "${GCP_SERVICE}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --region="${GCP_REGION}" \
+            --image="${{ steps.image.outputs.tag }}" \
+            --quiet
+
+      - name: Obter URL do serviço publicado
+        id: service_url
+        run: |
+          URL=$(gcloud run services describe "${GCP_SERVICE}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --region="${GCP_REGION}" \
+            --format='value(status.url)')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Validação pós-deploy (smoke test)
+        run: |
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' "${{ steps.service_url.outputs.url }}${HEALTH_PATH}")
+          echo "HTTP status recebido: $STATUS"
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
+            echo "::error::Validação pós-deploy falhou (status $STATUS)"
+            exit 1
+          fi
+          echo "API publicada e respondendo com sucesso em ${{ steps.service_url.outputs.url }}"
