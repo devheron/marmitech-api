@@ -31,14 +31,25 @@ jobs:
       - name: Build e testes (falha de teste interrompe aqui)
         run: mvn --batch-mode --no-transfer-progress clean package
 
-      - name: Verificação de dependências vulneráveis (OWASP)
-        run: >
-          mvn org.owasp:dependency-check-maven:check
-          --batch-mode --no-transfer-progress
-          -DnvdApiKey=${{ secrets.NVD_API_KEY }}
-          -DknownExploitedEnabled=false
-          -DnvdApiDelay=6000
-          -DfailBuildOnCVSS=7
+      - name: Verificação de dependências vulneráveis (OWASP, com retry)
+        run: |
+          MAX_TENTATIVAS=3
+          TENTATIVA=1
+          until mvn org.owasp:dependency-check-maven:check \
+            --batch-mode --no-transfer-progress \
+            -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
+            -DknownExploitedEnabled=false \
+            -DnvdApiDelay=6000 \
+            -DfailBuildOnCVSS=7
+          do
+            if [ "$TENTATIVA" -ge "$MAX_TENTATIVAS" ]; then
+              echo "::error::Falhou após $MAX_TENTATIVAS tentativas (provável instabilidade da NVD)."
+              exit 1
+            fi
+            echo "Tentativa $TENTATIVA falhou (provável 403 instável da NVD). Aguardando 30s antes de tentar de novo..."
+            TENTATIVA=$((TENTATIVA + 1))
+            sleep 30
+          done
 
       - name: Publicar relatório de dependências vulneráveis
         if: always()
