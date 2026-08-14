@@ -15,51 +15,55 @@ import java.util.List;
 @RequestMapping("/api/cliente")
 @RequiredArgsConstructor
 public class ClienteController {
+
+    private static final String ROLE_ADMIN = "hasRole('ADMIN')";
+    private static final String ROLE_ADMIN_FUNCIONARIO = "hasAnyRole('ADMIN','FUNCIONARIO')";
+
     private final ClienteService clienteService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PostMapping("/save")
     public ResponseEntity<ClienteResponseDTO> save(@RequestBody @Valid ClienteRequestDTO dto) {
         var result = clienteService.save(dto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findAll")
     public ResponseEntity<List<ClienteResponseDTO>> findAll() {
         var result = clienteService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findById/{id}")
     public ResponseEntity<ClienteResponseDTO> findById(@PathVariable Integer id) {
         var result = clienteService.findById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PutMapping("/update/{id}")
     public ResponseEntity<ClienteResponseDTO> update(@PathVariable Integer id, @RequestBody ClienteRequestDTO dto) {
         var result = clienteService.update(id, dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         clienteService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findByNome/{nome}")
     public ResponseEntity<List<ClienteResponseDTO>> findByNome(@PathVariable String nome) {
         var result = clienteService.findByNome(nome);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findByCpfCnpj/{cpf_cnpj}")
     public ResponseEntity<ClienteResponseDTO> findByCpfCnpj(@PathVariable String cpf_cnpj) {
         var result = clienteService.findByCpfCnpj(cpf_cnpj);

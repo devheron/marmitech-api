@@ -46,14 +46,15 @@ public class ProdutoService {
         return produtoRepository.findById( id ).orElseThrow( RuntimeException::new );
     }
 
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void delete(Integer id) {
-        var delete = findById( id );
+        Produto produtoParaExcluir = findById( id );
 
         if (pedidoItemRepository.existsByProdutoId( id )) {
             throw new IllegalStateException( "Não é possível excluir o produto, pois ele já está associado a um ou mais pedidos." );
         }
 
-        produtoRepository.delete( delete );
+        produtoRepository.delete( produtoParaExcluir );
     }
 
     public Produto update(Integer id, Produto produto) {

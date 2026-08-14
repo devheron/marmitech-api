@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/> 
     </parent>
     <groupId>com.marmitech</groupId>
     <artifactId>Marmitech</artifactId>
@@ -67,14 +67,13 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Conector de socket do Cloud SQL, usado apenas em producao -->
+       
         <dependency>
             <groupId>com.google.cloud.sql</groupId>
             <artifactId>mysql-socket-factory-connector-j-8</artifactId>
             <version>1.20.1</version>
         </dependency>
 
-        <!-- H2 Database (para testes e ambiente local) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -184,8 +183,31 @@
                 </executions>
 
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.21.2</version>
+                <configuration>
+                    <failOnViolation>true</failOnViolation>
+                    <printFailingErrors>true</printFailingErrors>
+                    <rulesets>
+                        <ruleset>category/java/errorprone.xml</ruleset>
+                        <ruleset>category/java/bestpractices.xml</ruleset>
+                    </rulesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>9.2.0</version>
+                <configuration>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <format>HTML</format>
+                </configuration>
+            </plugin>
         </plugins>
-       <!--teeste-->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

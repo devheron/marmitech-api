@@ -3,6 +3,8 @@ package com.marmitech.Marmitech.Config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,6 +17,8 @@ import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	//TRATAMENTO DE ERROS DE VALIDATIONS
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -39,7 +43,7 @@ public class GlobalExceptionHandler {
 	//TRATAMENTO DOS DEMAIS ERROS DA APLICAÇÃO E DE REGRAS DE NEGÓCIO
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handle03(Exception ex) {
-		ex.printStackTrace();
+		logger.error("Erro nao tratado", ex);
 		return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
