@@ -33,12 +33,7 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoService.save(dto), HttpStatus.CREATED);
     }
 
-<<<<<<< Updated upstream
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
-=======
-
     @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
->>>>>>> Stashed changes
     @GetMapping
     public ResponseEntity<List<PedidoResponseDTO>> findAll() {
         var result = pedidoService.findAll();
@@ -82,7 +77,6 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 
-<<<<<<< Updated upstream
     @GetMapping("/meus")
     public ResponseEntity<List<PedidoResponseDTO>> meusPedidos() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -93,10 +87,7 @@ public class PedidoController {
         return new ResponseEntity<>( pedidos, HttpStatus.OK );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-=======
     @PreAuthorize(ROLE_ADMIN)
->>>>>>> Stashed changes
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         pedidoService.delete(id);
