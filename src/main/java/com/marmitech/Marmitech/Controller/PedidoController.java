@@ -20,23 +20,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @RestController
 @RequestMapping("/api/pedido")
 public class PedidoController {
+
+    private static final String ROLE_ADMIN = "hasRole('ADMIN')";
+    private static final String ROLE_ADMIN_FUNCIONARIO = "hasAnyRole('ADMIN','FUNCIONARIO')";
+
     @Autowired
     private PedidoService pedidoService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PostMapping("/save")
     public ResponseEntity<PedidoResponseDTO> save(@RequestBody PedidoRequestDTO dto) {
         return new ResponseEntity<>(pedidoService.save(dto), HttpStatus.CREATED);
     }
 
+<<<<<<< Updated upstream
     @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+=======
+
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
+>>>>>>> Stashed changes
     @GetMapping
     public ResponseEntity<List<PedidoResponseDTO>> findAll() {
         var result = pedidoService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findById/{id}")
     public ResponseEntity<PedidoResponseDTO> findById(@PathVariable Integer id) {
         var result = pedidoService.findById(id);
@@ -44,28 +53,28 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findByStatus")
     public ResponseEntity<List<Pedido>> findByStatus(@RequestParam String status) {
         List<Pedido> result = pedidoService.findByStatus(status);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findByProdutoNome")
     public ResponseEntity<List<Pedido>> findByProdutoNome(@RequestParam String nomeProduto) {
         List<Pedido> result = pedidoService.findByProdutoNome(nomeProduto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','FUNCIONARIO')")
+    @PreAuthorize(ROLE_ADMIN_FUNCIONARIO)
     @GetMapping("/findByProduto")
     public ResponseEntity<List<Pedido>> findByProduto(@RequestParam int produtoId) {
         List<Pedido> result = pedidoService.findByProduto(produtoId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PutMapping("/update/{id}")
     public ResponseEntity<PedidoResponseDTO> update(@PathVariable Integer id, @RequestBody Pedido pedido) {
         Pedido updatedPedido = pedidoService.update(id, pedido);
@@ -73,6 +82,7 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 
+<<<<<<< Updated upstream
     @GetMapping("/meus")
     public ResponseEntity<List<PedidoResponseDTO>> meusPedidos() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -84,6 +94,9 @@ public class PedidoController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+=======
+    @PreAuthorize(ROLE_ADMIN)
+>>>>>>> Stashed changes
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         pedidoService.delete(id);

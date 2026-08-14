@@ -21,54 +21,56 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
 
+    private static final String ROLE_ADMIN = "hasRole('ADMIN')";
+
     private final UsuarioService usuarioService;
 
     @Autowired
     private JwUtil jwUtil;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PostMapping("/save")
     public ResponseEntity<UsuarioResponseDTO> save(@RequestBody @Valid UsuarioRequestDTO dto) {
         var result = usuarioService.save(dto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @GetMapping("/findAll")
     public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
         var result = usuarioService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @GetMapping("findById/{id}")
     public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer id) {
         var result = usuarioService.findById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @PutMapping("/update/{id}")
     public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Integer id, @RequestBody UsuarioRequestDTO dto) {
         var result = usuarioService.update(id, dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         usuarioService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @GetMapping("/findByCargo/{cargo}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByCargo(@PathVariable String cargo) {
         var result = usuarioService.findByCargo(cargo);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize(ROLE_ADMIN)
     @GetMapping("/findByNome/{nome}")
     public ResponseEntity<List<UsuarioResponseDTO>> findByNome(@PathVariable String nome) {
         var result = usuarioService.findByNome(nome);

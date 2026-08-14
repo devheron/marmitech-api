@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 //@Component
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 List<SimpleGrantedAuthority> authorities = cargo == null
                         ? List.of()
-                        : List.of(new SimpleGrantedAuthority("ROLE_" + cargo.toUpperCase()));
+                        : List.of(new SimpleGrantedAuthority("ROLE_" + cargo.toUpperCase(Locale.ROOT)));
 
                 var authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
