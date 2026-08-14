@@ -31,6 +31,24 @@ jobs:
       - name: Build e testes (falha de teste interrompe aqui)
         run: mvn --batch-mode --no-transfer-progress clean package
 
+      - name: Verificação de dependências vulneráveis (OWASP)
+        run: >
+          mvn org.owasp:dependency-check-maven:check
+          --batch-mode --no-transfer-progress
+          -DnvdApiKey=${{ secrets.NVD_API_KEY }}
+          -DknownExploitedEnabled=false
+          -DnvdApiDelay=6000
+          -DfailBuildOnCVSS=7
+
+      - name: Publicar relatório de dependências vulneráveis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: target/dependency-check-report.html
+          retention-days: 30
+          if-no-files-found: warn
+
       - name: Publicar relatório JaCoCo
         if: always()
         uses: actions/upload-artifact@v4
